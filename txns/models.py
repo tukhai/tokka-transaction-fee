@@ -3,7 +3,8 @@ from django.db import models
 
 class TransactionRecord(models.Model):
     hash = models.CharField(max_length=255)   # priority to index this, as this is the main API
-    block_number = models.IntegerField()   # need to index this column for fast query?
+    block_number = models.BigIntegerField()
+    timestamp = models.DateTimeField()   # need to index this column for fast query?
     fee = models.FloatField()
 
     class Meta:
@@ -13,7 +14,8 @@ class TransactionRecord(models.Model):
 
 class TransactionBatchRecord(models.Model):
     hash = models.CharField(max_length=255)   # priority to index this, as this is the main API
-    block_number = models.IntegerField()   # need to index this column for fast query?
+    block_number = models.BigIntegerField()
+    timestamp = models.DateTimeField()   # need to index this column for fast query?
     fee = models.FloatField()
 
     class Meta:

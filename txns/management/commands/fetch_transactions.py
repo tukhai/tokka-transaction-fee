@@ -3,6 +3,7 @@ import os
 import aiohttp
 import asyncio
 import asyncpg
+from datetime import datetime
 
 
 class Command(BaseCommand):
@@ -34,17 +35,17 @@ class Command(BaseCommand):
                         if data['status'] == '1' and data['result']:
                             transactions = [
                                 (
-                                    tnx['hash'],
-                                    int(tnx['blockNumber']),
-                                    int(tnx['gasPrice']) * int(tnx['gasUsed']) * pow(10, -18)
-                                ) for tnx in data['result']
+                                    txn['hash'],
+                                    int(txn['blockNumber']),
+                                    datetime.fromtimestamp(float(txn['timeStamp'])),
+                                    int(txn['gasPrice']) * int(txn['gasUsed']) * pow(10, -18)
+                                ) for txn in data['result']
                             ]
                             await conn.executemany('''
-                                INSERT INTO transaction_record (hash, block_number, fee)
-                                VALUES ($1, $2, $3)
-                                ON CONFLICT (hash, block_number) DO NOTHING
+                                INSERT INTO transaction_record (hash, block_number, timestamp, fee)
+                                VALUES ($1, $2, $3, $4)
+                                ON CONFLICT (hash, timestamp) DO NOTHING
                             ''', transactions)
-                await asyncio.sleep(0.01)
 
     def handle(self, *args, **options):
         loop = asyncio.get_event_loop()
