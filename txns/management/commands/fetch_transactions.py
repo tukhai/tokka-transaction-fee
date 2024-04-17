@@ -21,7 +21,7 @@ class Command(BaseCommand):
         address = os.environ.get('ADDRESS', None)
 
         latest_id = await conn.fetchval('SELECT block_number FROM transaction_record ORDER BY block_number DESC LIMIT 1')
-        url = f'https://api.etherscan.io/api?module=account&action=tokentx&address={address}&page=1&offset={1 if latest_id is None else 100}&startblock={latest_id or 0}&endblock=999999999&sort=desc&apikey={api_key}'
+        url = f'https://api.etherscan.io/api?module=account&action=tokentx&address={address}&page=1&offset=100&startblock={latest_id or 0}&endblock=999999999&sort=desc&apikey={api_key}'
 
         # offset = 10 # redundant to ensure no data loss
         # url = f'https://api.etherscan.io/api?module=account&action=tokentx&address={address}&page=1&offset={offset}&startblock=0&endblock=999999999&sort=desc&apikey={api_key}'
