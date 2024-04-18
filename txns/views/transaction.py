@@ -35,11 +35,20 @@ class Transaction(APIView):
 
         transaction = get_transaction(txn_hash)
         if transaction is None:
-            return JsonResponse({'message': 'transaction hash does not exist!'})
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Transaction hash does not exist!'
+            })
 
         timestamp = int(transaction.timestamp.timestamp())
         factor = get_historical_price_by_timestamp('ETHUSDT', timestamp)
-        return JsonResponse({'txn_fee_in_usdt': transaction.fee * factor})
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Transaction fee retrieved successfully!',
+            'data': {
+                'txn_fee_in_usdt': transaction.fee * factor
+            }
+        })
 
 
 def get_transaction(txn_hash):

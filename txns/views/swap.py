@@ -30,7 +30,7 @@ class SwapPrice(APIView):
     )
     def get(self, request, *args, **kwargs):
         """
-        Input transaction hash to get back the List executed price on each event log of the Transaction where Uniswap swap happens.
+        Input transaction hash to decode the List executed price on each event log of the Transaction where Uniswap swap happens.
         """
         txn_hash = request.GET.get('hash')
 
@@ -53,7 +53,13 @@ class SwapPrice(APIView):
                 # print(e)
                 continue
 
-        return JsonResponse({'swap_prices': swap_prices})
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Executed Price decoded successfully!',
+            'data': {
+                'swap_prices': swap_prices
+            }
+        })
 
 
 def get_contract_abi(contract_address):

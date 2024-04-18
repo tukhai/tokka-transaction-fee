@@ -39,7 +39,11 @@ class CompareRealtimeData(APIView):
         etherscan_api_url = os.environ.get('ETHERSCAN_API_URL', None)
         offset = 100   # compare first 100 tnxs
         url = f'{etherscan_api_url}?module=account&action=tokentx&address={address}&page=1&offset={offset}&startblock=0&endblock=999999999&sort=desc&apikey={api_key}'
-        return JsonResponse(compare(url, TransactionRecord))
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Realtime Record Data Test completed!',
+            'data': compare(url, TransactionRecord)
+        })
 
 
 class CompareBatchData(APIView):
@@ -80,7 +84,11 @@ class CompareBatchData(APIView):
         random_block = random.randint(start_block, end_block - test_blocks_count)
 
         url = f'{etherscan_api_url}?module=account&action=tokentx&address={address}&page=1&offset={test_blocks_count * 10}&startblock={random_block}&endblock={random_block + test_blocks_count}&sort=desc&apikey={api_key}'
-        return JsonResponse(compare(url, TransactionBatchRecord))
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Batch Record Data Test completed!',
+            'data': compare(url, TransactionBatchRecord)
+        })
 
 
 def compare(url, txn_model):
