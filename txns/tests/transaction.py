@@ -23,6 +23,7 @@ class TestTransaction(TestCase):
         self.factory = APIRequestFactory()
 
     def test_transaction_api(self):
+        print('Method: test_transaction_api - Test if get_transaction_by_hash API return correct transaction fee in USDT.')
         with patch('txns.models.TransactionRecord.objects.get') as mock_get:
             mock_get.return_value = self.transaction_record
 
@@ -37,12 +38,14 @@ class TestTransaction(TestCase):
             self.assertEqual(data['txn_fee_in_usdt'], 1.2155799999999999)
 
     def test_get_transaction_existing_record(self):
+        print('Method: test_get_transaction_existing_record - Test in case transaction record exists in DB.')
         with patch('txns.models.TransactionRecord.objects.get') as mock_get:
             mock_get.return_value = self.transaction_record
             result = get_transaction('test_hash_123')
             self.assertEqual(result, self.transaction_record)
 
     def test_get_transaction_nonexistent_record(self):
+        print('Method: test_get_transaction_nonexistent_record - Test in case transaction record does not exists in DB.')
         with patch('txns.models.TransactionRecord.objects.get') as mock_get_record:
             with patch('txns.models.TransactionBatchRecord.objects.get') as mock_get_batch:
                 mock_get_record.side_effect = TransactionRecord.DoesNotExist()
@@ -51,5 +54,6 @@ class TestTransaction(TestCase):
                 self.assertIsNone(result)
 
     def test_get_historical_price_by_timestamp(self):
+        print('Method: test_get_historical_price_by_timestamp - Check if Binance ETH/USDT return correct historical price.')
         price = get_historical_price_by_timestamp('ETHUSDT', 1672666667)
         self.assertEqual(price, 1215.37)

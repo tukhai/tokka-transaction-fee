@@ -27,7 +27,7 @@ class SwapPrice(APIView):
                 event_data = contract.events.Swap().process_log(log)
                 swap_prices.append(calc_executed_price(event_data['args']['sqrtPriceX96']))
             except Exception as e:
-                print(e)
+                # print(e)
                 continue
 
         return JsonResponse({'swap_prices': swap_prices})
