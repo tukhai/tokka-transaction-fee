@@ -13,8 +13,8 @@ class Command(BaseCommand):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.conn_params = {
-            'host': 'localhost',
-            'port': 5432,
+            'host': os.environ.get('HOST', 'localhost'),
+            'port': os.environ.get('PORT', '5432'),
             'user': os.environ.get('DATABASE_USER', None),
             'password': os.environ.get('DATABASE_PASSWORD', None),
             'database': os.environ.get('DATABASE_NAME', None)

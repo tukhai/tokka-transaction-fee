@@ -3,13 +3,10 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APIRequestFactory
 from unittest.mock import patch
+import json
 
 from ..views import Transaction, get_transaction, get_historical_price_by_timestamp
 from ..models import TransactionRecord, TransactionBatchRecord
-
-import json
-from dotenv import load_dotenv
-load_dotenv()
 
 
 class TestTransaction(TestCase):
@@ -33,7 +30,7 @@ class TestTransaction(TestCase):
             response = Transaction.as_view()(request)
 
             self.assertEqual(response.status_code, 200)
-            data = json.loads(response.content)
+            data = json.loads(response.content)['data']
             self.assertIn('txn_fee_in_usdt', data)
             self.assertEqual(data['txn_fee_in_usdt'], 1.2155799999999999)
 

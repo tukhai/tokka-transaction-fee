@@ -3,12 +3,9 @@ from unittest.mock import patch
 from django.urls import reverse
 from rest_framework.test import APIRequestFactory
 import json
+import os
 
 from ..views import SwapPrice, get_contract_abi, calc_executed_price
-
-import os
-from dotenv import load_dotenv
-load_dotenv()
 
 
 class TestSwapPrice(TestCase):
@@ -27,7 +24,7 @@ class TestSwapPrice(TestCase):
             response = SwapPrice.as_view()(request)
 
             self.assertEqual(response.status_code, 200)
-            data = json.loads(response.content)
+            data = json.loads(response.content)['data']
             self.assertIn('swap_prices', data)
             self.assertEqual(data['swap_prices'], [822849076.5350317])
 

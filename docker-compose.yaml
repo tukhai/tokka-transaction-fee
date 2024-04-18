@@ -56,8 +56,8 @@ services:
     pgadmin:
         image: dpage/pgadmin4
         environment:
-            PGADMIN_DEFAULT_EMAIL: ""
-            PGADMIN_DEFAULT_PASSWORD: ""
+            PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+            PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
         ports:
             - "5050:80"  # Expose pgAdmin on port 5050 of the host
         depends_on:
@@ -68,7 +68,7 @@ services:
     timescaledb:
         image: timescale/timescaledb:latest-pg14
         environment:
-            POSTGRES_PASSWORD: ""
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
         volumes:
             - timescaledb_data:/var/lib/postgresql/data  # Persist database between container restarts
         networks:
