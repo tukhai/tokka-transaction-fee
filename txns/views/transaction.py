@@ -2,12 +2,35 @@ import requests
 from rest_framework.views import APIView
 
 from django.http import JsonResponse
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 from ..models import TransactionRecord, TransactionBatchRecord
 
 
 class Transaction(APIView):
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('hash', openapi.IN_QUERY, description='Transaction Hash.', type=openapi.TYPE_STRING, example='0x15002bc19ff7f347f6fb4b4b5125ba7d3efc371843a762359ea8f57ec68518a2'),
+        ],
+        responses={
+            200: openapi.Response("Transaction Fee in USDT.", schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'txn_fee_in_usdt': openapi.Schema(
+                        type=openapi.TYPE_NUMBER,
+                        description='',
+                        example=4.363873604113853
+                    ),
+                }
+            )),
+            404: "Not found.",
+        }
+    )
     def get(self, request, *args, **kwargs):
+        """
+        Input transaction hash to get back the transaction fee in USDT.
+        """
         txn_hash = request.GET.get('hash')
 
         transaction = get_transaction(txn_hash)

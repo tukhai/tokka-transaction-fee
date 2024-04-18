@@ -5,14 +5,35 @@ from rest_framework.views import APIView
 
 from django.db.models import Q
 from django.http import JsonResponse
-from django.core.management import call_command
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 from ..models import TransactionRecord, TransactionBatchRecord
 from ..management.commands.batch_record import Command as BatchCommand
 
 
 class CompareRealtimeData(APIView):
+    @swagger_auto_schema(
+        responses={
+            200: openapi.Response("Realtime Testing Response.", schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'existing_count': openapi.Schema(type=openapi.TYPE_INTEGER, description='No.of txns found in realtime record.', example=49),
+                    'total_count': openapi.Schema(type=openapi.TYPE_INTEGER, description='No.of most recent txns we take as sample (hardcoded as 100), using Etherscan API.', example=49),
+                    'percentage_existing': openapi.Schema(type=openapi.TYPE_NUMBER, description='Percentage of txns found / sample.', example=100),
+                }
+            )),
+            404: "Not found.",
+        }
+    )
     def get(self, request, *args, **kwargs):
+        """
+        Run this API to Test how well realtime record can sync with Txns data on Etherscan.
+        This API will query the most recent 100 records (equivalent to around 50 txns) from Etherscan, and check if our Realtime TimescaleDB has these records.
+
+        As tested, most of the time the percentage is 100%, meaning there's almost no delay between Etherscan & our DB.
+        (the latency is less than the programmatical testing speed)
+        """
         api_key = os.environ.get('API_KEY', None)
         address = os.environ.get('ADDRESS', None)
         etherscan_api_url = os.environ.get('ETHERSCAN_API_URL', None)
@@ -22,9 +43,30 @@ class CompareRealtimeData(APIView):
 
 
 class CompareBatchData(APIView):
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('start_timestamp', openapi.IN_QUERY, description='Start timestamp of the batched time range.', type=openapi.TYPE_INTEGER, example=1704105600),
+            openapi.Parameter('end_timestamp', openapi.IN_QUERY, description='Start timestamp of the batched time range.', type=openapi.TYPE_INTEGER, example=1706784000),
+        ],
+        responses={
+            200: openapi.Response("Batch Testing Response.", schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'existing_count': openapi.Schema(type=openapi.TYPE_INTEGER, description='No.of txns found in batch record.', example=44),
+                    'total_count': openapi.Schema(type=openapi.TYPE_INTEGER, description='No.of txns in sample.', example=44),
+                    'percentage_existing': openapi.Schema(type=openapi.TYPE_NUMBER, description='Percentage of txns found / sample.', example=100),
+                }
+            )),
+            404: "Not found.",
+        }
+    )
     def get(self, request, *args, **kwargs):
-        start_timestamp = request.GET.get('start_timestamp')
-        end_timestamp = request.GET.get('end_timestamp')
+        """
+        Input a time range (start_timestamp and end_timestamp) that you have run batch record.
+        This API will select random samples of transactions within the time range, to see if they're available in batch record.
+        """
+        start_timestamp = request.query_params.get('start_timestamp', '')
+        end_timestamp = request.query_params.get('end_timestamp', '')
 
         batch_command_obj = BatchCommand()
 
