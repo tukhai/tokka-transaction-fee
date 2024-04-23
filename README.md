@@ -58,7 +58,7 @@ PGADMIN_DEFAULT_PASSWORD=
     - General > Name: could be anything
     - Connection: (You can find all of these credentials inside `.env` from **EMAIL**)
     ```
-    HOST=timescaledb # Host name/address
+    HOST=localhost # Host name/address
     PORT=5432 # Port
     DATABASE_NAME=postgres # Maintenance database
     DATABASE_USER=postgres # Username
@@ -127,10 +127,10 @@ docker-compose run --rm django_test python manage.py test
         - RabbitMQ is also more suitable than Redis as `message queue` for our use case because it can retains message to disk during down event.
 
 ### C/ Network
-- Compared to implement both app & DB on the same environemnt, Dockerize app & DB on different container has worst performance:
+- Compared to running the system without Docker, docker-compose with brdige network is:
     - 12% slower for batch data recording of 1 month & more latency for realtime recording
-- Since the app layer is smaller, we can actually implement app into same container with DB. When system scale up, we can easily partition by DB because there's not too much shared data / shared state between each API call.
-- However, we should put the worker that calculate the decoding of Uniswap swap event executed price into its own cluster, so that it's easier to scale.
+- We can system performance by using host network (only works on Linux, installing Docker Engine only, but not Docker Desktop)
+- Even for production deployment, we can still use host network to maximize performance.
 
 ### D/ Availability
 - As we're currently partition by time, if 1 server is down, user might not be able to get transaction by the hash inside the down server.
