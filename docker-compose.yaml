@@ -65,5 +65,44 @@ services:
             - timescaledb_data:/var/lib/postgresql/data  # Persist database between container restarts
         network_mode: host
 
+    rabbitmq:
+        image: "rabbitmq:3-management"
+        environment:
+            RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+            RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+        # volumes:
+        #     - "rabbitmq_data:/var/lib/rabbitmq"
+        network_mode: host
+
+    hash_rabbitmq_service:
+        build: .
+        container_name: hash_rabbitmq_container
+        image: tokka_txns_challenge:latest
+        env_file:
+            - .env
+        depends_on:
+            - rabbitmq
+            - timescaledb
+        network_mode: host
+
+    celery_worker:
+        build: .
+        container_name: celery_worker_container
+        image: tokka_txns_challenge:latest  # Ensures it uses the same image built for your Django app
+        env_file:
+            - .env
+        depends_on:
+            - rabbitmq
+            - django
+            - timescaledb
+        command: celery -A txns worker -l info --concurrency=16  # Adjust concurrency as needed
+        deploy:
+            resources:
+                limits:
+                    cpus: '16.0'
+                reservations:
+                    cpus: '8.0'
+        network_mode: host
+
 volumes:
     timescaledb_data:

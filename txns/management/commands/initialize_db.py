@@ -11,6 +11,7 @@ class Command(BaseCommand):
         with connection.cursor() as cursor:
             create_txn_table(cursor, 'transaction_record')
             create_txn_table(cursor, 'transaction_batch_record')
+            create_uniswap_table(cursor, 'transaction_uniswap_price')
 
         self.stdout.write("Database setup complete.")
 
@@ -38,3 +39,24 @@ def create_txn_table(cursor, table_name):
             );
         """)
         cursor.execute("SELECT create_hypertable(%s, 'timestamp');", [table_name])
+
+
+def create_uniswap_table(cursor, table_name):
+    cursor.execute("""
+        SELECT EXISTS (
+            SELECT FROM pg_tables
+            WHERE schemaname = 'public'
+            AND tablename = %s
+        );
+    """, [table_name])
+
+    if not cursor.fetchone()[0]:
+        cursor.execute(f"""
+            CREATE TABLE {table_name} (
+                hash VARCHAR(255),
+                timestamp TIMESTAMP,
+                price TEXT,
+                PRIMARY KEY (hash, timestamp)
+            );
+        """)
+        cursor.execute("SELECT create_hypertable('transaction_uniswap_price', 'timestamp');", [table_name])

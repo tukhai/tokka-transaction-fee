@@ -71,6 +71,9 @@ TEMPLATES = [
     },
 ]
 
+CELERY_BROKER_URL = f'amqp://{os.environ.get("RABBITMQ_DEFAULT_USER")}:{os.environ.get("RABBITMQ_DEFAULT_PASS")}@localhost:5672/'
+CELERY_RESULT_BACKEND = f'rpc://{os.environ.get("RABBITMQ_DEFAULT_USER")}:{os.environ.get("RABBITMQ_DEFAULT_PASS")}@localhost:5672/'
+
 WSGI_APPLICATION = 'workspace.wsgi.application'
 
 

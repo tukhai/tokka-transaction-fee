@@ -21,3 +21,13 @@ class TransactionBatchRecord(models.Model):
     class Meta:
         managed = False
         db_table = 'transaction_batch_record'
+
+
+class TransactionUniswapPrice(models.Model):
+    hash = models.CharField(max_length=255)
+    timestamp = models.DateTimeField()
+    price = models.TextField()
+
+    class Meta:
+        managed = False
+        db_table = 'transaction_uniswap_price'

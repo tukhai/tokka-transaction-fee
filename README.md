@@ -125,6 +125,7 @@ docker-compose run --rm django_test python manage.py test
     - amongst the `message queue`, `RabbitMQ` could be the most optimal choice:
         - 10 millions messages annual is still handlable by RabbitMQ. Even if it's scale up 2-3 times, it's still OK. Therefore, using Kafka would be over-complicated
         - RabbitMQ is also more suitable than Redis as `message queue` for our use case because it can retains message to disk during down event.
+    - since the calculation is slow, we dont need to do in realtime => can do this as BATCH
 
 ### C/ Network
 - Compared to running the system without Docker, docker-compose with brdige network is:
